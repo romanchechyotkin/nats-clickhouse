@@ -2,12 +2,31 @@ package main
 
 import (
 	"database/sql"
+	"embed"
 	"fmt"
 	"log"
 
+	"github.com/google/uuid"
 	_ "github.com/mailru/go-clickhouse"
 	"github.com/nats-io/nats.go"
 )
+
+const subject = "log_subj"
+
+type Level string
+
+const (
+	Info  = "info"
+	Debug = "debug"
+	Warn  = "warn"
+	Error = "error"
+)
+
+type Log struct {
+	ID    uuid.UUID `json:"id"`
+	Level Level     `json:"level"`
+	Text  string    `json:"text"`
+}
 
 func main() {
 	clickhouseCfg := ClickhouseConfig{
@@ -19,24 +38,23 @@ func main() {
 
 	clickhouseClient := newClickhouseClient(&clickhouseCfg)
 	_ = clickhouseClient
+	runMigration(clickhouseClient)
 
 	nc, _ := nats.Connect(nats.DefaultURL)
+	c, _ := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	defer c.Close()
 
-	// Channel Subscriber
-	ch := make(chan *nats.Msg, 64)
-	_, err := nc.ChanSubscribe("foo", ch)
-	if err != nil {
-		log.Println(err)
-	}
+	ch := make(chan struct{})
 
-	// Simple Publisher
-	err = nc.Publish("foo", []byte("Hello World"))
-	if err != nil {
-		log.Println(err)
-	}
+	c.Subscribe(subject, func(subj, reply string, l *Log) {
+		fmt.Printf("Received a log msg on subject %s! %+v\n", subj, l)
+		ch <- struct{}{}
+	})
 
-	msg := <-ch
-	log.Println(string(msg.Data))
+	me := &Log{ID: uuid.New(), Level: Info, Text: "robert lox"}
+	c.Publish(subject, me)
+
+	<-ch
 }
 
 type ClickhouseConfig struct {
@@ -67,4 +85,31 @@ func newClickhouseClient(cfg *ClickhouseConfig) *sql.DB {
 	log.Println("clickhouse current database:", dbName)
 
 	return connect
+}
+
+//go:embed migrations/*.sql
+var migrations embed.FS
+
+func runMigration(clickhouseClient *sql.DB) {
+	dir, err := migrations.ReadDir("migrations")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, entry := range dir {
+		content, err := migrations.ReadFile("migrations/" + entry.Name())
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println(string(content))
+
+		exec, err := clickhouseClient.Exec(string(content))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println(exec.RowsAffected())
+	}
+
 }

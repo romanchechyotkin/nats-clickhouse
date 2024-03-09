@@ -1,115 +1,39 @@
 package main
 
 import (
-	"database/sql"
-	"embed"
-	"fmt"
-	"log"
+	"log/slog"
+	"net/http"
+
+	"nats+clickhouse/clickhouse"
+	"nats+clickhouse/logging"
+	"nats+clickhouse/nats"
 
 	"github.com/google/uuid"
 	_ "github.com/mailru/go-clickhouse"
-	"github.com/nats-io/nats.go"
 )
-
-const subject = "log_subj"
-
-type Level string
-
-const (
-	Info  = "info"
-	Debug = "debug"
-	Warn  = "warn"
-	Error = "error"
-)
-
-type Log struct {
-	ID    uuid.UUID `json:"id"`
-	Level Level     `json:"level"`
-	Text  string    `json:"text"`
-}
 
 func main() {
-	clickhouseCfg := ClickhouseConfig{
-		Host:     "localhost",
-		Port:     "8123",
-		User:     "clickhouse",
-		Password: "8123",
-	}
+	logging.New()
+	clickhouse.New()
+	natsConn := nats.New()
 
-	clickhouseClient := newClickhouseClient(&clickhouseCfg)
-	_ = clickhouseClient
-	runMigration(clickhouseClient)
+	logging.Logger.Info("running server", slog.Int("port", 8080))
 
-	nc, _ := nats.Connect(nats.DefaultURL)
-	c, _ := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
-	defer c.Close()
+	http.HandleFunc("/click", func(w http.ResponseWriter, req *http.Request) {
+		logging.Logger.Info("got request", slog.String("uri", req.RequestURI), slog.String("method", req.Method))
 
-	ch := make(chan struct{})
+		go func() {
+			me := &logging.Log{ID: uuid.New(), Level: logging.Info, Text: "robert lox"}
+			err := natsConn.Publish(nats.Subject, me)
+			if err != nil {
+				logging.Logger.Error("failed to publish message", err)
+			}
+		}()
 
-	c.Subscribe(subject, func(subj, reply string, l *Log) {
-		fmt.Printf("Received a log msg on subject %s! %+v\n", subj, l)
-		ch <- struct{}{}
+		_, _ = w.Write([]byte("clickhouse"))
 	})
 
-	me := &Log{ID: uuid.New(), Level: Info, Text: "robert lox"}
-	c.Publish(subject, me)
-
-	<-ch
-}
-
-type ClickhouseConfig struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-}
-
-func newClickhouseClient(cfg *ClickhouseConfig) *sql.DB {
-	connStr := fmt.Sprintf("http://%s:%s/?user=%s&password=%s", cfg.Host, cfg.Port, cfg.User, cfg.Password)
-	driver := "clickhouse"
-	connect, err := sql.Open(driver, connStr)
-	if err != nil {
-		log.Fatalf("Open >> %v", err)
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		logging.Logger.Error(err.Error())
 	}
-
-	if err := connect.Ping(); err != nil {
-		log.Fatalf("Ping >> %v", err)
-	}
-
-	var dbName string
-	err = connect.QueryRow("SELECT currentDatabase()").Scan(&dbName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("clickhouse current database:", dbName)
-
-	return connect
-}
-
-//go:embed migrations/*.sql
-var migrations embed.FS
-
-func runMigration(clickhouseClient *sql.DB) {
-	dir, err := migrations.ReadDir("migrations")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, entry := range dir {
-		content, err := migrations.ReadFile("migrations/" + entry.Name())
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		log.Println(string(content))
-
-		exec, err := clickhouseClient.Exec(string(content))
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		log.Println(exec.RowsAffected())
-	}
-
 }

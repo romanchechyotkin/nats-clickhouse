@@ -1,0 +1,34 @@
+{"time":"2024-03-09T14:47:05.9977588+03:00","level":"INFO","msg":"clickhouse current database:","!BADKEY":"default"}
+{"time":"2024-03-09T14:47:06.0278874+03:00","level":"ERROR","msg":"Code: 82, Message: Database nats already exists"}
+{"time":"2024-03-09T14:47:06.1382296+03:00","level":"ERROR","msg":"Code: 57, Message: Table nats.logs_view already exists"}
+{"time":"2024-03-09T14:47:06.1413844+03:00","level":"INFO","msg":"running server","port":8080}
+{"time":"2024-03-09T14:47:17.137984+03:00","level":"INFO","msg":"clickhouse current database:","!BADKEY":"default"}
+{"time":"2024-03-09T14:47:17.1639662+03:00","level":"ERROR","msg":"Code: 82, Message: Database nats already exists"}
+{"time":"2024-03-09T14:47:17.2579924+03:00","level":"ERROR","msg":"Code: 57, Message: Table nats.logs_view already exists"}
+{"time":"2024-03-09T14:47:17.260087+03:00","level":"INFO","msg":"running server","port":8080}
+{"time":"2024-03-09T14:47:58.9180682+03:00","level":"INFO","msg":"clickhouse current database:","!BADKEY":"default"}
+{"time":"2024-03-09T14:47:58.9449893+03:00","level":"ERROR","msg":"Code: 82, Message: Database nats already exists"}
+{"time":"2024-03-09T14:47:59.0387407+03:00","level":"ERROR","msg":"Code: 57, Message: Table nats.logs_view already exists"}
+{"time":"2024-03-09T14:47:59.0409136+03:00","level":"INFO","msg":"running server","port":8080}
+{"time":"2024-03-09T14:49:24.0575951+03:00","level":"INFO","msg":"clickhouse current database:","!BADKEY":"default"}
+{"time":"2024-03-09T14:49:24.0897733+03:00","level":"ERROR","msg":"Code: 82, Message: Database nats already exists"}
+{"time":"2024-03-09T14:49:24.1877639+03:00","level":"ERROR","msg":"Code: 57, Message: Table nats.logs_view already exists"}
+{"time":"2024-03-09T14:49:24.1909759+03:00","level":"INFO","msg":"running server","port":8080}
+{"time":"2024-03-09T14:49:28.3544726+03:00","level":"INFO","msg":"got request","uri":"/click","method":"GET"}
+{"time":"2024-03-09T14:49:28.3549982+03:00","level":"ERROR","msg":"failed to publish message","!BADKEY":"nats: connection closed"}
+{"time":"2024-03-09T14:49:29.1403719+03:00","level":"INFO","msg":"got request","uri":"/click","method":"GET"}
+{"time":"2024-03-09T14:49:29.1403719+03:00","level":"ERROR","msg":"failed to publish message","!BADKEY":"nats: connection closed"}
+{"time":"2024-03-09T14:49:30.954973+03:00","level":"INFO","msg":"got request","uri":"/click","method":"GET"}
+{"time":"2024-03-09T14:49:30.9554033+03:00","level":"ERROR","msg":"failed to publish message","!BADKEY":"nats: connection closed"}
+{"time":"2024-03-09T14:49:49.2868009+03:00","level":"INFO","msg":"clickhouse current database:","!BADKEY":"default"}
+{"time":"2024-03-09T14:49:49.3169008+03:00","level":"ERROR","msg":"Code: 82, Message: Database nats already exists"}
+{"time":"2024-03-09T14:49:49.4168995+03:00","level":"ERROR","msg":"Code: 57, Message: Table nats.logs_view already exists"}
+{"time":"2024-03-09T14:49:49.4188994+03:00","level":"INFO","msg":"running server","port":8080}
+{"time":"2024-03-09T14:49:52.1280382+03:00","level":"INFO","msg":"got request","uri":"/click","method":"GET"}
+{"time":"2024-03-09T14:49:52.1294578+03:00","level":"INFO","msg":"Received a logging msg on subject log_subj! &{ID:1ab4c37e-98f5-4a79-8920-55b58e88498b Level:info Text:robert lox}"}
+{"time":"2024-03-09T14:49:52.7938859+03:00","level":"INFO","msg":"got request","uri":"/click","method":"GET"}
+{"time":"2024-03-09T14:49:52.7948858+03:00","level":"INFO","msg":"Received a logging msg on subject log_subj! &{ID:b0b65fb1-fd1e-4d1e-937d-a52635ffcecd Level:info Text:robert lox}"}
+{"time":"2024-03-09T14:49:54.4654997+03:00","level":"INFO","msg":"got request","uri":"/click","method":"GET"}
+{"time":"2024-03-09T14:49:54.4669356+03:00","level":"INFO","msg":"Received a logging msg on subject log_subj! &{ID:3b18e1b2-faa8-4a6e-87b5-c55744e7e6fd Level:info Text:robert lox}"}
+{"time":"2024-03-09T14:49:55.3724492+03:00","level":"INFO","msg":"got request","uri":"/click","method":"GET"}
+{"time":"2024-03-09T14:49:55.3734492+03:00","level":"INFO","msg":"Received a logging msg on subject log_subj! &{ID:d5c13170-958b-493f-8053-f77af089114d Level:info Text:robert lox}"}

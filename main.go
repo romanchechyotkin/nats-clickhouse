@@ -7,9 +7,6 @@ import (
 	"nats+clickhouse/clickhouse"
 	"nats+clickhouse/logging"
 	"nats+clickhouse/nats"
-
-	"github.com/google/uuid"
-	_ "github.com/mailru/go-clickhouse"
 )
 
 func main() {
@@ -19,16 +16,10 @@ func main() {
 
 	logging.Logger.Info("running server", slog.Int("port", 8080))
 
+	logging.NewRingBuffer(10, natsConn)
+
 	http.HandleFunc("/click", func(w http.ResponseWriter, req *http.Request) {
 		logging.Logger.Info("got request", slog.String("uri", req.RequestURI), slog.String("method", req.Method))
-
-		go func() {
-			me := &logging.Log{ID: uuid.New(), Level: logging.Info, Text: "robert lox"}
-			err := natsConn.Publish(nats.Subject, me)
-			if err != nil {
-				logging.Logger.Error("failed to publish message", err)
-			}
-		}()
 
 		_, _ = w.Write([]byte("clickhouse"))
 	})

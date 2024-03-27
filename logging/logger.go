@@ -15,6 +15,8 @@ func New() {
 		log.Fatal(err)
 	}
 
+	file.Seek(0, 0)
+
 	multiWriter := io.MultiWriter(file, os.Stdout)
 
 	Logger = slog.New(slog.NewJSONHandler(multiWriter, &slog.HandlerOptions{

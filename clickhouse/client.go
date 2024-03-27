@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	"nats+clickhouse/logging"
+
+	_ "github.com/mailru/go-clickhouse"
 )
 
 func New() {
